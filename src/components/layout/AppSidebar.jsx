@@ -27,7 +27,7 @@ export function AppSidebar({ role }) {
       <div className="px-6 py-5">
         {!isCollapsed && (
           <div className="flex items-center gap-2">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-600">
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary">
               <Package className="h-6 w-6 text-white" />
             </div>
             <div>
@@ -37,7 +37,7 @@ export function AppSidebar({ role }) {
           </div>
         )}
         {isCollapsed && (
-          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-600 mx-auto">
+          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary mx-auto">
             <Package className="h-6 w-6 text-white" />
           </div>
         )}
@@ -56,7 +56,7 @@ export function AppSidebar({ role }) {
               to={item.url}
               className={`flex items-center gap-3 px-3 py-2 rounded-lg mb-1 transition-colors
                 ${isActive 
-                  ? "bg-blue-50 text-blue-600 font-medium" 
+                  ? "bg-primary/10 text-primary font-medium" 
                   : "text-gray-600 hover:bg-gray-50"
                 }`}
             >

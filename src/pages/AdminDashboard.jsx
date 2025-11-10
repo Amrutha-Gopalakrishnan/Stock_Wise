@@ -33,7 +33,7 @@ export default function AdminDashboard() {
         <StatCard
           title="Total Products"
           value={totalProducts}
-          icon={<Package className="text-primary" />}
+          icon={Package}
         />
         <StatCard
           title="Stock Value"
@@ -42,12 +42,14 @@ export default function AdminDashboard() {
               ₹{totalStockValue.toLocaleString("en-IN", { maximumFractionDigits: 0 })}
             </span>
           }
-          icon={<DollarSign className="text-green-500" />}
+          icon={DollarSign}
+          iconClassName="text-green-500"
         />
         <StatCard
           title="Active Alerts"
           value={activeAlerts}
-          icon={<AlertTriangle className="text-destructive" />}
+          icon={AlertTriangle}
+          iconClassName="text-destructive"
         />
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">

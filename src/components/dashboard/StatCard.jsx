@@ -1,6 +1,7 @@
 import { Card, CardContent } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
 
-export function StatCard({ title, value, icon: Icon, trend, trendPositive }) {
+export function StatCard({ title, value, icon: Icon, trend, trendPositive, iconClassName }) {
   return (
     <Card className="transition-all hover:shadow-lg">
       <CardContent className="p-6">
@@ -19,7 +20,7 @@ export function StatCard({ title, value, icon: Icon, trend, trendPositive }) {
             )}
           </div>
           <div className="flex h-14 w-14 items-center justify-center rounded-full bg-primary/10">
-            <Icon className="h-7 w-7 text-primary" />
+            <Icon className={cn("h-7 w-7 text-primary", iconClassName)} />
           </div>
         </div>
       </CardContent>

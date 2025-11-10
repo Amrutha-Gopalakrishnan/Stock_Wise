@@ -219,8 +219,244 @@ const SidebarRail = React.forwardRef(({ className, ...props }, ref) => {
 });
 SidebarRail.displayName = "SidebarRail";
 
-// (⚡ For brevity, remaining small subcomponents like SidebarInset, SidebarInput, SidebarHeader, Footer, etc.
-// will stay identical — all JSX-safe and ready to use)
+const SidebarInset = React.forwardRef(({ className, ...props }, ref) => {
+  return (
+    <main
+      ref={ref}
+      className={cn(
+        "relative flex min-h-svh flex-1 flex-col bg-background",
+        "peer-data-[variant=inset]:min-h-[calc(100svh-theme(spacing.4))] md:peer-data-[variant=inset]:m-2 md:peer-data-[side=left]:peer-data-[variant=inset]:ml-0 md:peer-data-[side=right]:peer-data-[variant=inset]:mr-0 md:peer-data-[variant=inset]:rounded-lg md:peer-data-[variant=inset]:shadow",
+        className
+      )}
+      {...props}
+    />
+  );
+});
+SidebarInset.displayName = "SidebarInset";
+
+const SidebarHeader = React.forwardRef(({ className, ...props }, ref) => {
+  return (
+    <div
+      ref={ref}
+      className={cn("flex h-16 shrink-0 items-center gap-2 border-b border-sidebar-border px-4", className)}
+      {...props}
+    />
+  );
+});
+SidebarHeader.displayName = "SidebarHeader";
+
+const SidebarFooter = React.forwardRef(({ className, ...props }, ref) => {
+  return (
+    <div
+      ref={ref}
+      className={cn("flex h-16 shrink-0 items-center gap-2 border-t border-sidebar-border px-4", className)}
+      {...props}
+    />
+  );
+});
+SidebarFooter.displayName = "SidebarFooter";
+
+const SidebarContent = React.forwardRef(({ className, ...props }, ref) => {
+  return (
+    <div
+      ref={ref}
+      className={cn("flex flex-1 flex-col gap-2 overflow-auto px-2 py-2 group-data-[collapsible=icon]:px-2", className)}
+      {...props}
+    />
+  );
+});
+SidebarContent.displayName = "SidebarContent";
+
+const SidebarGroup = React.forwardRef(({ className, ...props }, ref) => {
+  return <div ref={ref} className={cn("relative flex w-full min-w-0 flex-col p-2", className)} {...props} />;
+});
+SidebarGroup.displayName = "SidebarGroup";
+
+const SidebarGroupLabel = React.forwardRef(({ className, asChild = false, ...props }, ref) => {
+  const Comp = asChild ? Slot : "span";
+  return (
+    <Comp
+      ref={ref}
+      className={cn(
+        "duration-200 flex h-8 shrink-0 items-center rounded-md px-2 text-xs font-medium text-sidebar-foreground/70 outline-none ring-sidebar-ring transition-[margin,opa] ease-linear focus-visible:ring-2 [&>svg]:size-4 [&>svg]:shrink-0",
+        "group-data-[collapsible=icon]:-mt-8 group-data-[collapsible=icon]:opacity-0",
+        className
+      )}
+      {...props}
+    />
+  );
+});
+SidebarGroupLabel.displayName = "SidebarGroupLabel";
+
+const SidebarGroupAction = React.forwardRef(({ className, asChild = false, ...props }, ref) => {
+  const Comp = asChild ? Slot : "button";
+  return (
+    <Comp
+      ref={ref}
+      className={cn(
+        "absolute right-3 top-3.5 flex aspect-square w-5 items-center justify-center rounded-md p-0 text-sidebar-foreground outline-none ring-sidebar-ring transition-transform hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2 [&>svg]:size-4 [&>svg]:shrink-0",
+        "group-data-[collapsible=icon]:hidden",
+        className
+      )}
+      {...props}
+    />
+  );
+});
+SidebarGroupAction.displayName = "SidebarGroupAction";
+
+const SidebarGroupContent = React.forwardRef(({ className, ...props }, ref) => {
+  return <div ref={ref} className={cn("w-full text-sm", className)} {...props} />;
+});
+SidebarGroupContent.displayName = "SidebarGroupContent";
+
+const SidebarMenu = React.forwardRef(({ className, ...props }, ref) => {
+  return <ul ref={ref} className={cn("flex w-full min-w-0 flex-col gap-1", className)} {...props} />;
+});
+SidebarMenu.displayName = "SidebarMenu";
+
+const SidebarMenuItem = React.forwardRef(({ className, ...props }, ref) => {
+  return <li ref={ref} className={cn("group/menu-item relative", className)} {...props} />;
+});
+SidebarMenuItem.displayName = "SidebarMenuItem";
+
+const sidebarMenuButtonVariants = cva(
+  "peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left text-sm outline-none ring-sidebar-ring transition-[width,height,padding] hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 group-has-[[data-sidebar=menu-action]]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium data-[active=true]:text-sidebar-accent-foreground data-[state=open]:hover:bg-sidebar-accent data-[state=open]:hover:text-sidebar-accent-foreground group-data-[collapsible=icon]:!size-8 group-data-[collapsible=icon]:!p-2 [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0",
+  {
+    variants: {
+      variant: {
+        default: "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+        outline:
+          "bg-background shadow-[0_0_0_1px_hsl(var(--sidebar-border))] hover:bg-sidebar-accent hover:text-sidebar-accent-foreground hover:shadow-[0_0_0_1px_hsl(var(--sidebar-accent))]",
+      },
+      size: {
+        default: "h-8 text-sm",
+        sm: "h-7 text-xs",
+        lg: "h-12 text-sm group-data-[collapsible=icon]:!p-0",
+      },
+    },
+    defaultVariants: {
+      variant: "default",
+      size: "default",
+    },
+  }
+);
+
+const SidebarMenuButton = React.forwardRef(
+  ({ asChild = false, isActive = false, variant = "default", size = "default", className, ...props }, ref) => {
+    const Comp = asChild ? Slot : "button";
+    return (
+      <Comp
+        ref={ref}
+        className={cn(sidebarMenuButtonVariants({ variant, size }), className)}
+        data-active={isActive}
+        {...props}
+      />
+    );
+  }
+);
+SidebarMenuButton.displayName = "SidebarMenuButton";
+
+const SidebarMenuAction = React.forwardRef(({ className, asChild = false, ...props }, ref) => {
+  const Comp = asChild ? Slot : "button";
+  return (
+    <Comp
+      ref={ref}
+      data-sidebar="menu-action"
+      className={cn(
+        "absolute right-1 top-1.5 flex aspect-square w-5 items-center justify-center rounded-md p-0 text-sidebar-foreground outline-none ring-sidebar-ring transition-transform hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2 peer-hover/menu-button:text-sidebar-accent-foreground [&>svg]:size-4 [&>svg]:shrink-0",
+        "group-data-[collapsible=icon]:hidden",
+        className
+      )}
+      {...props}
+    />
+  );
+});
+SidebarMenuAction.displayName = "SidebarMenuAction";
+
+const SidebarMenuBadge = React.forwardRef(({ className, ...props }, ref) => {
+  return (
+    <span
+      ref={ref}
+      className={cn(
+        "absolute right-1 flex h-5 min-w-5 items-center justify-center rounded-md px-1 text-xs font-medium tabular-nums text-sidebar-foreground select-none pointer-events-none",
+        "peer-hover/menu-button:text-sidebar-accent-foreground peer-data-[active=true]/menu-button:text-sidebar-accent-foreground",
+        "group-data-[collapsible=icon]:hidden",
+        className
+      )}
+      {...props}
+    />
+  );
+});
+SidebarMenuBadge.displayName = "SidebarMenuBadge";
+
+const SidebarMenuSkeleton = React.forwardRef(({ className, showIcon = false, ...props }, ref) => {
+  return (
+    <SidebarMenuItem ref={ref} {...props}>
+      <SidebarMenuButton size="sm" asChild>
+        <span>
+          {showIcon && <Skeleton className="size-4" />}
+          <Skeleton className="h-4 flex-1" style={{ maxWidth: SIDEBAR_WIDTH }} />
+        </span>
+      </SidebarMenuButton>
+    </SidebarMenuItem>
+  );
+});
+SidebarMenuSkeleton.displayName = "SidebarMenuSkeleton";
+
+const SidebarMenuSub = React.forwardRef(({ className, ...props }, ref) => {
+  return (
+    <ul
+      ref={ref}
+      className={cn(
+        "mx-3.5 flex min-w-0 translate-x-px flex-col gap-1 border-l border-sidebar-border px-2.5 py-0.5",
+        "group-data-[collapsible=icon]:hidden",
+        className
+      )}
+      {...props}
+    />
+  );
+});
+SidebarMenuSub.displayName = "SidebarMenuSub";
+
+const SidebarMenuSubItem = React.forwardRef(({ ...props }, ref) => {
+  return <li ref={ref} {...props} />;
+});
+SidebarMenuSubItem.displayName = "SidebarMenuSubItem";
+
+const SidebarMenuSubButton = React.forwardRef(({ asChild = false, size = "sm", className, ...props }, ref) => {
+  const Comp = asChild ? Slot : "a";
+  return (
+    <Comp ref={ref} className={cn(sidebarMenuButtonVariants({ variant: "outline", size }), "peer/sub-menubutton", className)} {...props} />
+  );
+});
+SidebarMenuSubButton.displayName = "SidebarMenuSubButton";
+
+const SidebarInput = React.forwardRef(({ className, ...props }, ref) => {
+  return (
+    <Input
+      ref={ref}
+      className={cn(
+        "h-8 w-full bg-background shadow-none focus-visible:ring-2 focus-visible:ring-sidebar-ring",
+        "placeholder:text-sidebar-foreground/50",
+        "group-data-[collapsible=icon]:size-8 group-data-[collapsible=icon]:px-2",
+        className
+      )}
+      {...props}
+    />
+  );
+});
+SidebarInput.displayName = "SidebarInput";
+
+const SidebarSeparator = React.forwardRef(({ className, ...props }, ref) => {
+  return (
+    <Separator
+      ref={ref}
+      className={cn("mx-2 w-[calc(100%-1rem)] border-sidebar-border", "group-data-[collapsible=icon]:mx-2 group-data-[collapsible=icon]:w-4", className)}
+      {...props}
+    />
+  );
+});
+SidebarSeparator.displayName = "SidebarSeparator";
 
 export {
   Sidebar,
