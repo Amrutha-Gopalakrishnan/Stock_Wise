@@ -9,7 +9,6 @@ import AdminDashboard from "./pages/AdminDashboard";
 import StaffDashboard from "./pages/StaffDashboard";
 import Products from "./pages/Products";
 import Suppliers from "./pages/Suppliers";
-import Reports from "./pages/Reports";
 import Alerts from "./pages/Alerts";
 import StaffAlerts from "./pages/StaffAlerts";
 import StaffActivity from "./pages/StaffActivity";
@@ -50,14 +49,6 @@ function App() {
               element={
                 <DashboardLayout role="admin">
                   <Suppliers />
-                </DashboardLayout>
-              }
-            />
-            <Route
-              path="/admin/reports"
-              element={
-                <DashboardLayout role="admin">
-                  <Reports />
                 </DashboardLayout>
               }
             />

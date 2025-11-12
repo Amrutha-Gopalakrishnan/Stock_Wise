@@ -1,62 +1,4 @@
-// import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-// import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-// import { Badge } from "@/components/ui/badge";
-// import { Button } from "@/components/ui/button";
-// import { alerts } from "@/data/dummyData";
-// import { toast } from "sonner";
-
-// export default function Alerts() {
-//   const handleResolve = (alertId) => {
-//     toast.success("Alert marked as resolved!");
-//     // You can add further alert-resolving logic here
-//   };
-
-//   return (
-//     <div>
-//       <h1 className="text-4xl font-bold mb-2">Alerts</h1>
-//       <p className="text-muted-foreground mb-6">
-//         Monitor and manage low stock alerts
-//       </p>
-//       <Card>
-//         <CardHeader>
-//           <CardTitle>Active Alerts</CardTitle>
-//         </CardHeader>
-//         <CardContent>
-//           <Table>
-//             <TableHeader>
-//               <TableRow>
-//                 <TableHead>ID</TableHead>
-//                 <TableHead>Product</TableHead>
-//                 <TableHead>Status</TableHead>
-//                 <TableHead>Stock</TableHead>
-//                 <TableHead>Action</TableHead>
-//               </TableRow>
-//             </TableHeader>
-//             <TableBody>
-//               {alerts.map(alert => (
-//                 <TableRow key={alert.id}>
-//                   <TableCell>{alert.id}</TableCell>
-//                   <TableCell>{alert.product}</TableCell>
-//                   <TableCell>
-//                     <Badge variant="destructive">{alert.status}</Badge>
-//                   </TableCell>
-//                   <TableCell>{alert.stock}</TableCell>
-//                   <TableCell>
-//                     <Button variant="outline" size="sm" onClick={() => handleResolve(alert.id)}>
-//                       Mark as resolved
-//                     </Button>
-//                   </TableCell>
-//                 </TableRow>
-//               ))}
-//             </TableBody>
-//           </Table>
-//         </CardContent>
-//       </Card>
-//     </div>
-//   );
-// }
-
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
@@ -65,32 +7,84 @@ import { toast } from "sonner";
 import { supabase, getCurrentUserId } from "@/supabaseClient"; // adjust path as needed
 
 // Sample alerts data - replace with fetching from Supabase
-const dummyAlerts = [
-  // Example alert objects
-  {
-    id: 1,
-    product: "Product A",
-    status: "active",
-    stock: 5,
-  },
-  {
-    id: 2,
-    product: "Product B",
-    status: "active",
-    stock: 0,
-  },
-];
-
 export default function Alerts() {
-  const [alerts, setAlerts] = useState(dummyAlerts);
+  const uuidPattern = useMemo(
+    () =>
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i,
+    []
+  );
+  const [alerts, setAlerts] = useState([]);
+  const [loadingAlerts, setLoadingAlerts] = useState(true);
+  const [products, setProducts] = useState([]);
 
   // Form state for creating an alert
   const [alertProductId, setAlertProductId] = useState("");
   const [alertType, setAlertType] = useState("low_stock"); // can be low_stock, out_of_stock, reorder
 
+  const fetchAlerts = async () => {
+    setLoadingAlerts(true);
+    const { data, error } = await supabase
+      .from("alerts")
+      .select(
+        `
+          id,
+          alert_type,
+          status,
+          created_at,
+          products (
+            id,
+            name
+          )
+        `
+      )
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      console.error("Error loading alerts:", error);
+      toast.error("Failed to load alerts");
+      setAlerts([]);
+    } else {
+      const formatted = (data || []).map((alert) => ({
+        id: alert.id,
+        product_id: alert?.products?.id ?? null,
+        product_name: alert?.products?.name ?? "Unknown product",
+        status: alert.status,
+        alert_type: alert.alert_type,
+        created_at: alert.created_at,
+      }));
+      setAlerts(formatted);
+    }
+    setLoadingAlerts(false);
+  };
+
+  const fetchProducts = async () => {
+    const { data, error } = await supabase
+      .from("products")
+      .select("id, name")
+      .order("name");
+    if (error) {
+      console.error("Error loading products:", error);
+      toast.error("Failed to load products");
+      setProducts([]);
+      return;
+    }
+    setProducts(data || []);
+  };
+
+  useEffect(() => {
+    fetchAlerts();
+    fetchProducts();
+  }, []);
+
   // Create alert handler
   async function handleCreateAlert(e) {
     e.preventDefault();
+
+    if (!uuidPattern.test(alertProductId.trim())) {
+      toast.error("Product ID must be a valid UUID");
+      return;
+    }
+
     try {
       const { data, error } = await supabase
         .from("alerts")
@@ -115,7 +109,7 @@ export default function Alerts() {
 
       toast.success("Alert created successfully!");
 
-      // Optionally refresh alerts list here (fetchAlerts)
+      await fetchAlerts();
 
       // Clear form fields
       setAlertProductId("");
@@ -140,10 +134,10 @@ export default function Alerts() {
       toast.success("Alert marked as resolved!");
 
       // Update local state to reflect resolved alert
-      setAlerts(prev =>
-        prev.map(alert =>
-          alert.id === alertId ? { ...alert, status: "resolved" } : alert
-        )
+      setAlerts((prev) =>
+        prev.map((alert) =>
+          alert.id === alertId ? { ...alert, status: "resolved" } : alert,
+        ),
       );
     } catch (err) {
       console.error("Error resolving alert:", err);
@@ -162,18 +156,25 @@ export default function Alerts() {
           Product ID:
           <input
             className="block w-full border rounded p-2"
-            type="text"
+            list="product-options"
             value={alertProductId}
-            onChange={e => setAlertProductId(e.target.value)}
+            onChange={(e) => setAlertProductId(e.target.value)}
             required
           />
+          <datalist id="product-options">
+            {products.map((product) => (
+              <option key={product.id} value={product.id}>
+                {product.name} — {product.id}
+              </option>
+            ))}
+          </datalist>
         </label>
         <label>
           Alert Type:
           <select
             className="block w-full border rounded p-2"
             value={alertType}
-            onChange={e => setAlertType(e.target.value)}
+            onChange={(e) => setAlertType(e.target.value)}
             required
           >
             <option value="low_stock">Low Stock</option>
@@ -203,25 +204,37 @@ export default function Alerts() {
               {alerts.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={5} className="text-center">
-                    No alerts available
+                    {loadingAlerts ? "Loading alerts..." : "No alerts available"}
                   </TableCell>
                 </TableRow>
               ) : (
-                alerts.map(alert => (
+                alerts.map((alert) => (
                   <TableRow key={alert.id}>
                     <TableCell>{alert.id}</TableCell>
-                    <TableCell>{alert.product}</TableCell>
+                    <TableCell>{alert.product_name}</TableCell>
                     <TableCell>
-                      <Badge variant={alert.status === "active" ? "destructive" : "secondary"}>
+                      <Badge
+                        variant={
+                          alert.status === "active" ? "destructive" : "secondary"
+                        }
+                      >
                         {alert.status}
                       </Badge>
                     </TableCell>
-                    <TableCell>{alert.stock}</TableCell>
+                    <TableCell>{alert.alert_type}</TableCell>
                     <TableCell>
-                      {alert.status === "active" && (
-                        <Button variant="outline" size="sm" onClick={() => handleResolve(alert.id)}>
+                      {alert.status === "active" ? (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleResolve(alert.id)}
+                        >
                           Mark as resolved
                         </Button>
+                      ) : (
+                        <span className="text-xs text-muted-foreground">
+                          Resolved
+                        </span>
                       )}
                     </TableCell>
                   </TableRow>

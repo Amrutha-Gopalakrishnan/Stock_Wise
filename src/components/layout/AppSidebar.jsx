@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { LayoutDashboard, Package, Users, FileText, AlertTriangle, ClipboardList, Activity, LogOut } from "lucide-react";
+import { LayoutDashboard, Package, Users, AlertTriangle, ClipboardList, Activity, LogOut } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useLocation } from "react-router-dom";
 
@@ -7,7 +7,6 @@ const adminItems = [
   { title: "Dashboard", url: "/admin", icon: LayoutDashboard },
   { title: "Manage Products", url: "/admin/products", icon: Package },
   { title: "Manage Suppliers", url: "/admin/suppliers", icon: Users },
-  { title: "Reports", url: "/admin/reports", icon: FileText },
   { title: "Alerts", url: "/admin/alerts", icon: AlertTriangle },
 ];
 
@@ -31,7 +30,7 @@ export function AppSidebar({ role }) {
               <Package className="h-6 w-6 text-white" />
             </div>
             <div>
-              <h2 className="text-lg font-bold text-gray-900">Inventory</h2>
+              <h2 className="text-lg font-bold text-gray-900">StockWise</h2>
               <p className="text-xs text-gray-500 capitalize">{role} Panel</p>
             </div>
           </div>
