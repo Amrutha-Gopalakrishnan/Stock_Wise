@@ -68,5 +68,6 @@ StockWise is an inventory management and stock-monitoring application tailored f
 
 ---
 
-## License
-No explicit license; intended for the Whizlabs assessment submission. Update attribution as needed for further development.
+Team
+Developer: Amrutha Gopalakrishnan
+Project: Whizlabs Assessment Submission

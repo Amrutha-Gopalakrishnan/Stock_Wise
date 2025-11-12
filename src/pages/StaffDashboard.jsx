@@ -96,7 +96,7 @@ export default function StaffDashboard() {
 
     if (error) {
       console.error("Error loading transactions:", error);
-      toast.warning("Showing locally saved transactions (Supabase unavailable)");
+      toast.warning("Showing saved transactions");
     } else {
       localDb.saveStockTransactions(
         (data || []).map((item) => ({
@@ -236,7 +236,7 @@ export default function StaffDashboard() {
       toast.success(
         issues.length === 0
           ? "Transaction logged successfully!"
-          : "Transaction saved locally (Supabase unavailable)",
+          : "Transaction saved",
       );
       setProductInput("");
       setSelectedProductId("");

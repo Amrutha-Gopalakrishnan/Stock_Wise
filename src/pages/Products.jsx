@@ -300,7 +300,7 @@ export default function Products() {
     toast.success(
       issues.length === 0
         ? "Product saved successfully!"
-        : "Product saved locally (Supabase unavailable)",
+        : "Product saved!",
     );
     setOpen(false);
 

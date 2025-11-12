@@ -112,7 +112,7 @@ export default function Suppliers() {
     toast.success(
       issues.length === 0
         ? "Supplier saved successfully!"
-        : "Supplier saved locally (Supabase unavailable)",
+        : "Supplier saved",
     );
 
     setOpen(false);

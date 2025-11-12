@@ -66,7 +66,7 @@ export function AppSidebar({ role }) {
         })}
       </nav>
 
-      <div className="absolute bottom-0 w-full p-4">
+      <div className="absolute bottom-0  p-4">
         <NavLink
           to="/login"
           className="flex items-center gap-3 px-3 py-2 text-gray-600 rounded-lg hover:bg-gray-50 transition-colors"
@@ -74,7 +74,7 @@ export function AppSidebar({ role }) {
             localStorage.removeItem('user');
           }}
         >
-          <LogOut className="h-5 w-5 flex-shrink-0" />
+          <LogOut className="h-5 w-5" />
           {!isCollapsed && <span>Logout</span>}
         </NavLink>
       </div>
